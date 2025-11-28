@@ -71,7 +71,9 @@ app.get("/profile", async (req, res) => {
         res.render("profile", { userData: null });
     }
 })
-
+// ============================================================
+// THÊM(ĐĂNG KÍ), XÓA, SỬA TÀI KHOẢN VÀ ĐĂNG NHẬP
+// ============================================================
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
   
