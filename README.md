@@ -65,7 +65,13 @@ docker ps
 
 ### Bước 5: Khởi tạo database
 
-Chạy các file SQL theo thứ tự:
+Chạy script tự động để import toàn bộ database:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File import-db.ps1
+```
+
+Hoặc chạy từng file SQL thủ công theo thứ tự:
 
 ```powershell
 # 1. Tạo database và tables
