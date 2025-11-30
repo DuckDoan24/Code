@@ -11,26 +11,27 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ============================================================
 -- INSERT Useraccount (15 users)
 -- ============================================================
+-- "$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm" là hash password của "1", gán cho toàn bộ user mẫu
 -- 5 ADMIN (UserID 1–5)
-CALL sp_InsertUser('Nguyễn Minh An',     'admin1@gmail.com', '$2b$10$2N9BFlUc85qzv4X0PaIvxOf9.2FH3laM2w5Gwp.BPXKgxFHZSO7tG', 'Male',   '0900000001', '1989-01-01');
-CALL sp_InsertUser('Trần Hoài Bảo',      'admin2@gmail.com', 'hash', 'Male',   '0900000002', '1988-02-02');
-CALL sp_InsertUser('Lê Thị Cẩm Tú',      'admin3@gmail.com', 'hash', 'Female', '0900000003', '1987-03-03');
-CALL sp_InsertUser('Phạm Quang Dũng',    'admin4@gmail.com', 'hash', 'Male',   '0900000004', '1986-04-04');
-CALL sp_InsertUser('Đỗ Gia Hân',         'admin5@gmail.com', 'hash', 'Female', '0900000005', '1985-05-05');
+CALL sp_InsertUser('Nguyễn Minh An',     'admin1@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0900000001', '1989-01-01');
+CALL sp_InsertUser('Trần Hoài Bảo',      'admin2@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0900000002', '1988-02-02');
+CALL sp_InsertUser('Lê Thị Cẩm Tú',      'admin3@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0900000003', '1987-03-03');
+CALL sp_InsertUser('Phạm Quang Dũng',    'admin4@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0900000004', '1986-04-04');
+CALL sp_InsertUser('Đỗ Gia Hân',         'admin5@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0900000005', '1985-05-05');
 
 -- 5 SELLER (UserID 6–10)
-CALL sp_InsertUser('Nguyễn Thanh Long',  'seller1@gmail.com', 'hash', 'Male',   '0910000001', '1990-01-01');
-CALL sp_InsertUser('Phan Minh Thư',      'seller2@gmail.com', 'hash', 'Female', '0910000002', '1991-02-02');
-CALL sp_InsertUser('Lê Quốc Huy',        'seller3@gmail.com', 'hash', 'Male',   '0910000003', '1992-03-03');
-CALL sp_InsertUser('Võ Ngọc Trâm',       'seller4@gmail.com', 'hash', 'Female', '0910000004', '1993-04-04');
-CALL sp_InsertUser('Bùi Đức Toàn',       'seller5@gmail.com', 'hash', 'Male',   '0910000005', '1994-05-05');
+CALL sp_InsertUser('Nguyễn Thanh Long',  'seller1@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0910000001', '1990-01-01');
+CALL sp_InsertUser('Phan Minh Thư',      'seller2@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0910000002', '1991-02-02');
+CALL sp_InsertUser('Lê Quốc Huy',        'seller3@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0910000003', '1992-03-03');
+CALL sp_InsertUser('Võ Ngọc Trâm',       'seller4@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0910000004', '1993-04-04');
+CALL sp_InsertUser('Bùi Đức Toàn',       'seller5@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0910000005', '1994-05-05');
 
 -- 5 BUYER (UserID 11–15)
-CALL sp_InsertUser('Nguyễn Thị Mai',     'buyer1@gmail.com', 'hash', 'Female', '0920000001', '2000-01-01');
-CALL sp_InsertUser('Trần Văn Khải',      'buyer2@gmail.com', 'hash', 'Male',   '0920000002', '2001-02-02');
-CALL sp_InsertUser('Hoàng Gia Phúc',     'buyer3@gmail.com', 'hash', 'Male',   '0920000003', '2002-03-03');
-CALL sp_InsertUser('Lý Mỹ Uyên',         'buyer4@gmail.com', 'hash', 'Female', '0920000004', '2003-04-04');
-CALL sp_InsertUser('Đặng Huỳnh Nhung',   'buyer5@gmail.com', 'hash', 'Female', '0920000005', '2004-05-05');
+CALL sp_InsertUser('Nguyễn Thị Mai',     'buyer1@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0920000001', '2000-01-01');
+CALL sp_InsertUser('Trần Văn Khải',      'buyer2@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0920000002', '2001-02-02');
+CALL sp_InsertUser('Hoàng Gia Phúc',     'buyer3@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Male',   '0920000003', '2002-03-03');
+CALL sp_InsertUser('Lý Mỹ Uyên',         'buyer4@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0920000004', '2003-04-04');
+CALL sp_InsertUser('Đặng Huỳnh Nhung',   'buyer5@gmail.com', '$2b$10$YNARoLW5YDfBIEqc4bFkiuV5NTt/5O079Hacv0xoWZqWGpO2iWzXm', 'Female', '0920000005', '2004-05-05');
 
 -- ============================================================
 -- INSERT Adminaccount
