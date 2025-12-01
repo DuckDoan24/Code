@@ -79,6 +79,13 @@
                                             <button class="btn-delete" data-product-id="<%= product.ProductID %>">
                                                 Xóa
                                             </button>
+                                            <button class="btn-edit" 
+                                                    data-product-id="<%= product.ProductID %>"
+                                                    data-product-name="<%= product.ProductName %>"
+                                                    data-product-description="<%= product.Description %>"
+                                                    data-product-saleID="<%= product.SaleOffEventID %>">
+                                                Chỉnh sửa
+                                            </button>
                                         <% } else { %>
                                             <span style="color: #999;">Không có quyền</span>
                                         <% } %>
@@ -94,6 +101,35 @@
         </main>
     </div>
 
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cập nhật sản phẩm id <span id="modal-product-id"></span></h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="form-group">
+                        <label for="modal-name">Tên sản phẩm</label>
+                        <input type="text" id="modal-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-description">Mô tả sản phẩm</label>
+                        <input type="text" id="modal-description" name="description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-saleID">Mã chương trình khuyến mãi</label>
+                        <input type="number" id="modal-saleID" name="saleID">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="cancelBtn">Hủy</button>
+                <button class="btn btn-submit" id="submitEditBtn">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Event delegation for delete buttons
         document.addEventListener('DOMContentLoaded', function() {
@@ -102,6 +138,52 @@
                     const button = e.target.closest('.btn-delete');
                     const productId = button.getAttribute('data-product-id');
                     deleteProduct(productId);
+                }
+
+                // Edit product modal logic
+                const modal = document.getElementById('editModal');
+                const closeBtn = document.querySelector('.close');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const editBtns = document.querySelectorAll('.btn-edit');
+                const submitBtn = document.getElementById('submitEditBtn');
+                
+                editBtns.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = this.getAttribute('data-product-id');
+                        const name = this.getAttribute('data-product-name');
+                        const description = this.getAttribute('data-product-description');
+                        const saleID = this.getAttribute('data-product-saleID');
+                        
+                        document.getElementById('modal-product-id').textContent = id;
+                        document.getElementById('modal-name').value = name;
+                        document.getElementById('modal-description').value = description;
+                        document.getElementById('modal-saleID').value = saleID;
+
+                        modal.style.display = 'block';
+                    });
+                });
+                
+                closeBtn.onclick = function() {
+                    modal.style.display = 'none';
+                }
+
+                cancelBtn.onclick = function() {
+                    modal.style.display = 'none';
+                }
+                
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+                
+                submitBtn.onclick = function() {
+                    const productId = document.getElementById('modal-product-id').textContent;
+                    const newName = document.getElementById('modal-name').value;
+                    const newDescription = document.getElementById('modal-description').value;
+                    const newSaleID = document.getElementById('modal-saleID').value;
+                    console.log("Submitting update for product:", productId, newName, newDescription, newSaleID);
+                    updateProduct(productId, newName, newDescription, newSaleID);
                 }
             });
         });
@@ -130,6 +212,37 @@
                 }
             } catch (err) {
                 alert(`Lỗi kết nối: ${err.message}`);
+            }
+        }
+
+        async function updateProduct(productId, newName, newDescription, newSaleID) {
+            console.log("Updating product:", productId, newName, newDescription, newSaleID);
+            try {
+                const body = {
+                    name: newName,
+                    description: newDescription,
+                    saleOffEventId: newSaleID ? Number(newSaleID) : null
+                };
+
+                const response = await fetch(`/products/update/${productId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                const data = await response.json();
+                
+                if (data.ok) {
+                    alert(data.message);
+                    document.getElementById('editModal').style.display = 'none';
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert(error.message);
             }
         }
     </script>
@@ -210,6 +323,19 @@
             background: #c82333;
         }
 
+        .btn-edit {
+            background: #242fff;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-edit:hover {
+            background: #3842ff;
+        }
+
         .errors {
             background: #f8d7da;
             border: 1px solid #f5c6cb;
@@ -239,6 +365,117 @@
 
         tr:hover {
             background: #f8f9fa;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .modal-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+        
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-box p {
+            margin: 0.5rem 0;
+            color: #555;
+        }
+        
+        .info-box strong {
+            color: #333;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            flex: 1;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .btn-submit {
+            background: #1937ff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            flex: 1;
+        }
+        
+        .btn-submit:hover {
+            background: #344fff;
         }
     </style>
 </body>

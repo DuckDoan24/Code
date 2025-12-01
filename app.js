@@ -15,6 +15,7 @@ const pool = mysql.createPool({
 });
 app.set("view engine", "ejs")
 app.use(express.urlencoded({extended: false}))
+app.use(express.json())
 app.use(cookieParser())
 app.use(express.static("public"))
 
@@ -241,7 +242,7 @@ app.get("/products/underperforming", async (req, res) => {
 });
 
 
-app.update("/products/update/:id", async (req, res) => {
+app.put("/products/update/:id", async (req, res) => {
 
     if (!res.locals.user) {
         return res.status(401).json({ ok: false, message: "Unauthorized" });
@@ -249,10 +250,7 @@ app.update("/products/update/:id", async (req, res) => {
 
     const productId = req.params.id;
     const userId = res.locals.user.id;
-
     const { name, description, saleOffEventId } = req.body;
-
-
 
     try {
         const [sellerCheck] = await pool.query(

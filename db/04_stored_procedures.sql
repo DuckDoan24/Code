@@ -273,6 +273,8 @@ BEGIN
     SELECT
         P.ProductID,
         P.Name AS ProductName,
+        P.SaleOffEventID,
+        P.Description,
         COUNT(CASE WHEN O.Status = 'Cancelled' THEN 1 END) AS TotalCancelledOrders,
         AVG(R.Rating) AS AverageRating
     FROM

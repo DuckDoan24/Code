@@ -183,7 +183,7 @@ INSERT INTO Address (BuyerID, Detail, Name, PhoneNumber) VALUES
 -- ============================================================
 INSERT INTO `Order` (BuyerID, AddressID, Amount, Status, DeliveryFee) VALUES
 (11, 1, 0, 'Pending', 30000),
-(11, 2, 0, 'Completed', 30000),
+(11, 2, 0, 'Cancelled', 0),
 (12, 3, 0, 'Pending', 30000),
 (12, 4, 0, 'Delivered', 30000),
 (13, 5, 0, 'Pending', 25000),
