@@ -194,13 +194,10 @@ app.delete("/user/delete", async (req, res) => {
 
 // GET: Hiển thị giao diện và danh sách tìm kiếm
 app.get("/products/underperforming", async (req, res) => {
-    // 1. Kiểm tra đăng nhập (nếu cần bảo mật)
     if (!res.locals.user) {
         return res.redirect("/login");
     }
 
-    // 2. Lấy tham số từ URL (Query String)
-    // Mặc định: minCancel = 0, maxRate = 5.0 nếu người dùng chưa nhập
     const minCancel = req.query.minCancel || 0;
     const maxRate = req.query.maxRate || 5.0;
     
@@ -214,15 +211,13 @@ app.get("/products/underperforming", async (req, res) => {
             [minCancel, maxRate]
         );
         
-        // Rows trả về từ CALL thường có dạng [data, metadata], lấy phần tử đầu tiên
         productList = rows[0];
 
     } catch (err) {
         errors.push(err.message);
     }
 
-    // 4. Kiểm tra role của user
-    const userId = res.locals.user.id; // <-- Sửa từ UserID thành id
+    const userId = res.locals.user.id;
     let canDeleteProduct = false;
 
     try {
@@ -234,7 +229,6 @@ app.get("/products/underperforming", async (req, res) => {
         canDeleteProduct = sellerCheck.length > 0 || adminCheck.length > 0;
     } catch (err) {
         console.error('Error checking role:', err);
-        // Ignore error, default canDeleteProduct = false
     }
 
     // 5. Render ra view ejs
@@ -246,18 +240,21 @@ app.get("/products/underperforming", async (req, res) => {
     });
 });
 
-// DELETE: Xóa sản phẩm
-app.delete("/products/delete/:id", async (req, res) => {
-    // API trả về JSON để Client (Frontend) xử lý qua Fetch/AJAX
+
+app.update("/products/update/:id", async (req, res) => {
+
     if (!res.locals.user) {
         return res.status(401).json({ ok: false, message: "Unauthorized" });
     }
 
     const productId = req.params.id;
-    const userId = res.locals.user.id; // <-- Sửa từ UserID thành id
+    const userId = res.locals.user.id;
+
+    const { name, description, saleOffEventId } = req.body;
+
+
 
     try {
-        // Kiểm tra quyền: User phải là Seller hoặc Admin
         const [sellerCheck] = await pool.query(
             "SELECT UserID FROM Seller WHERE UserID = ?",
             [userId]
@@ -271,7 +268,74 @@ app.delete("/products/delete/:id", async (req, res) => {
         const isSeller = sellerCheck.length > 0;
         const isAdmin = adminCheck.length > 0;
 
-        // Nếu không phải Seller hoặc Admin
+        if (!isSeller && !isAdmin) {
+            return res.status(403).json({ 
+                ok: false, 
+                message: "Bạn không có quyền cập nhật sản phẩm. Chỉ Seller hoặc Admin mới được phép." 
+            });
+        }
+
+        if (isSeller && !isAdmin) {
+            const [productCheck] = await pool.query(
+                `SELECT p.ProductID 
+                 FROM Product p
+                 JOIN Shop s ON p.ShopID = s.ShopID
+                 WHERE p.ProductID = ? AND s.SellerID = ?`,
+                [productId, userId]
+            );
+
+            if (productCheck.length === 0) {
+                return res.status(403).json({ 
+                    ok: false, 
+                    message: "Bạn chỉ có thể cập nhật sản phẩm của shop mình." 
+                });
+            }
+        }
+
+        // Gọi stored procedure sp_UpdateProduct với OUT parameters
+        const [rows] = await pool.query(
+            "CALL sp_UpdateProduct(?,?,?,?, @errorCode, @errorMessage)",
+            [productId, name, description, saleOffEventId || null]
+        );
+
+        // Lấy OUT parameters
+        const [results] = await pool.query("SELECT @errorCode AS errorCode, @errorMessage AS errorMessage");
+        const { errorCode, errorMessage } = results[0];
+
+        if (errorCode === 0) {
+            return res.json({ ok: true, message: "Cập nhật sản phẩm thành công!" });
+        } else {
+            return res.status(400).json({ ok: false, message: errorMessage });
+        }
+    } catch (err) {
+        return res.status(500).json({ ok: false, message: err.message });
+    }
+});
+
+
+// DELETE: Xóa sản phẩm
+app.delete("/products/delete/:id", async (req, res) => {
+    if (!res.locals.user) {
+        return res.status(401).json({ ok: false, message: "Unauthorized" });
+    }
+
+    const productId = req.params.id;
+    const userId = res.locals.user.id;
+
+    try {
+        const [sellerCheck] = await pool.query(
+            "SELECT UserID FROM Seller WHERE UserID = ?",
+            [userId]
+        );
+        
+        const [adminCheck] = await pool.query(
+            "SELECT AdminID FROM Adminaccount WHERE AdminID = ?",
+            [userId]
+        );
+
+        const isSeller = sellerCheck.length > 0;
+        const isAdmin = adminCheck.length > 0;
+
         if (!isSeller && !isAdmin) {
             return res.status(403).json({ 
                 ok: false, 
@@ -279,7 +343,6 @@ app.delete("/products/delete/:id", async (req, res) => {
             });
         }
 
-        // Nếu là Seller, kiểm tra sản phẩm có thuộc shop của họ không
         if (isSeller && !isAdmin) {
             const [productCheck] = await pool.query(
                 `SELECT p.ProductID 
